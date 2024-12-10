@@ -1,14 +1,7 @@
 namespace APN;
 
-public class Product
+public class Product(string productName, decimal price)
 {
-    private string ProductName { get; set; }
-    private decimal Price { get; set; }
-
-    public Product(string productName, decimal price)
-    {
-        ProductName = productName;
-        Price = price;
-    }
-    
+    public string ProductName { get; set; } = productName;
+    public decimal Price { get; set; } = price;
 }

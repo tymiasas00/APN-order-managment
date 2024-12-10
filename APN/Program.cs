@@ -5,7 +5,12 @@
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            bool running = true;
+
+            while (running)
+            {
+                Console.WriteLine();
+            }
         }
     }
 }
