@@ -16,25 +16,43 @@ public class Order
         {
             existingProduct.Quantity += quantity;
         }
-            
     }
 
-    public void RemoveProduct(Product product, int quantity = 1)
+    public void RemoveProduct(string name, int quantity = 1)
     {
-        var index = _orderItems.FindIndex(c => c.Product == product);
-        if (_orderItems[index].Quantity > quantity)
+        var orderItem = _orderItems
+            .FirstOrDefault(i => string.Equals(i.Product.ProductName, name, StringComparison.OrdinalIgnoreCase));
+
+        if (orderItem == null)
         {
-            _orderItems[index].Quantity -= quantity;
+            throw new InvalidOperationException($"Product with name '{name}' not found in the order.");
         }
-        else if (_orderItems[index].Quantity == quantity)
+
+        RemoveOrderItem(orderItem, quantity);
+    }
+
+    private void RemoveOrderItem(OrderItem orderItem, int quantity = 1)
+    {
+        if (orderItem.Quantity > quantity)
         {
-            _orderItems.RemoveAt(index);
+            orderItem.Quantity -= quantity;
+        }
+        else if (orderItem.Quantity == quantity)
+        {
+            _orderItems.Remove(orderItem);
         }
         else
         {
-            throw new InvalidOperationException($"Cannot remove {quantity} products from {_orderItems[index].Product}");
+            throw new InvalidOperationException($"Cannot remove {quantity} products. Only {orderItem.Quantity} available.");
         }
-        
+    }
+
+    public void DisplayOrderSummary()
+    {
+        foreach (var orderItem in _orderItems)
+        {
+            Console.WriteLine(orderItem.FormattedOrderItem());
+        }
     }
 
     public decimal Total()
@@ -44,6 +62,5 @@ public class Order
             return 0;
         }
         return _orderItems.Sum(x => x.CalculateItemPrice());
-        
     }
 }
