@@ -17,6 +17,6 @@ public class OrderItem
 
     public string FormattedOrderItem()
     {
-        return $"Product: {Product.ProductName}, Quantity: {Quantity}";
+        return $"Produkt: {Product.ToString()}, Ilość: {Quantity}";
     }
 }
