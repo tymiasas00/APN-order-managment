@@ -18,8 +18,13 @@ public class Order
         }
     }
 
-    public void RemoveProduct(string name, int quantity = 1)
+    public void RemoveProduct(string? name, int quantity = 1)
     {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            Console.WriteLine("[!] Nazwa produktu nie może być pusta.");
+            return;
+        }
         var orderItem = _orderItems
             .FirstOrDefault(i => string.Equals(i.Product.ProductName, name, StringComparison.OrdinalIgnoreCase));
 
@@ -53,6 +58,22 @@ public class Order
         {
             Console.WriteLine(orderItem.FormattedOrderItem());
         }
+
+        decimal discount = CalculateProductDiscount();
+        decimal totalBeforeDiscount = _orderItems.Sum(x => x.CalculateItemPrice());
+
+        Console.WriteLine($"\nWartość zamówienia przed rabatem: {totalBeforeDiscount:C}");
+        if (discount > 0)
+        {
+            Console.WriteLine($"Rabat na produkty: -{discount:C}");
+        }
+
+        decimal total = Total();
+        if (totalBeforeDiscount > 5000)
+        {
+            Console.WriteLine($"Rabat 5% za przekroczenie 5000 PLN: -{totalBeforeDiscount * 0.05m:C}");
+        }
+        Console.WriteLine($"Łączna wartość zamówienia: {total:C}\n");
     }
 
     public decimal Total()
@@ -61,6 +82,35 @@ public class Order
         {
             return 0;
         }
-        return _orderItems.Sum(x => x.CalculateItemPrice());
+
+        decimal total = _orderItems.Sum(x => x.CalculateItemPrice());
+
+        total -= CalculateProductDiscount();
+
+        if (total > 5000)
+        {
+            total *= 0.95m; 
+        }
+
+        return total;
+    }
+
+    private decimal CalculateProductDiscount()
+    {
+        var allProducts = _orderItems
+            .SelectMany(x => Enumerable.Repeat(x.Product.Price, x.Quantity))
+            .OrderBy(price => price)
+            .ToList();
+
+        if (allProducts.Count < 2)
+        {
+            return 0; 
+        }
+
+        decimal discountOption1 = allProducts[1] * 0.10m;
+
+        decimal discountOption2 = allProducts.Count >= 3 ? allProducts[2] * 0.20m : 0;
+
+        return Math.Max(discountOption1, discountOption2);
     }
 }

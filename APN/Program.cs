@@ -75,7 +75,7 @@ internal class Program
                     PrintSeparator();
 
                     Console.Write("Podaj nazwę produktu do usunięcia: ");
-                    string productName = Console.ReadLine();
+                    string? productName = Console.ReadLine();
 
                     Console.Write("Podaj ilość do usunięcia (domyślnie 1): ");
                     if (!int.TryParse(Console.ReadLine(), out int removeQuantity) || removeQuantity <= 0)
